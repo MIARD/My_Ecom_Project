@@ -1,3 +1,4 @@
+{% load cart_tag %}
 <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
   <div class="container">
     <a href="{% url 'App_Shop:home'%}" class="navbar-brand">Djanog E-Commerce Project</a>
@@ -6,9 +7,11 @@
   <div class="collapse navbar-collapse" id="navbarNav">
     <ul class="navbar-nav ml-auto">
       {% if request.user.is_authenticated %}
-      <a href="#" class="nav-link">
         <li class="nav-item text-light">
-        <i style="color:white" class="fa fa-shopping-cart"></i>Cart</a>
+          <a href="{% url 'App_Order:cart' %}" class="nav-link">
+        <i style="color:white" class="fa fa-shopping-cart"></i>Cart
+        <span class="badge badge-light">{{request.user|cart_total}}</span>
+      </a>
       </li>
       <li class="nav-item dropdown">
         <a style="color:white" class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><i class="fas fa-user-tie"></i>{{request.user.profile.username}}</a>
