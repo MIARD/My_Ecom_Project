@@ -41,7 +41,7 @@ def cart_view(request):
         return render(request, 'App_Order/cart.html', context={'carts':carts, 'order':order})
     else:
         messages.warning(request, "You don't have any item in your cart")
-        return redirect("App_shop:home")
+        return redirect("App_Shop:home")
 
 @login_required
 def  remove_from_cart(request, pk):

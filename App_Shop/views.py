@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
 # Models
-from App_Shop.models import Product,Category
+from App_Shop.models import Product, Category
 
 # Mixin
 from django.contrib.auth.mixins import LoginRequiredMixin
