@@ -1,3 +1,43 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponseRedirect, redirect
+from django.contrib import messages
+# Models and Forms
+from App_Order.models import Order
+from App_Payment.forms import BillingForm
+from App_Payment.forms import BillingAddress
 
-# Create your views here.
+# For payment
+import requests
+from sslcommerz_python.payment import SSLCSession
+from decimal import Decimal
+import socket
+# Authentication
+from django.contrib.auth.decorators import login_required
+
+@login_required
+def checkout(request):
+    saved_address = BillingAddress.objects.get_or_create(user=request.user)
+    saved_address = saved_address[0]
+    form = BillingForm(instance=saved_address)
+    if request.method == 'POST':
+        form = BillingForm(request.POST, instance=saved_address)
+        if form.is_valid():
+            form.save()
+            form = BillingForm(instance=saved_address)
+            messages.success(request, f"Shipping Address Saved!")
+    order_qs = Order.objects.filter(user=request.user, ordered=False)
+    order_items = order_qs[0].orderitems.all()
+    order_total = order_qs[0].get_total()
+    return render(request, 'App_Payment/checkout.html', context={'form':form, 'order_items':order_items, 'order_total':order_total, 'saved_address':saved_address})
+
+
+@login_required
+def payment(request):
+    saved_address = BillingAddress.objects.get_or_create(user=request.user)
+    if not saved_address[0].is_fully_filled():
+        messages.info(request,f"Please complete shiping address!")
+        return redirect("App_Payment:checkout")
+    if not request.user.profile.is_fully_filled():
+        messages.info(request, f"Please complete profile details.")
+        return redirect("App_Login:profile")
+    mypayment = SSLCSession(sslc_is_sandbox=True, sslc_store_id='miard5ff8771c14163', sslc_store_pass='miard5ff8771c14163@ssl')
+    return render(request, "App_Payment/payment.html",context={})
